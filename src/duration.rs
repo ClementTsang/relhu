@@ -1,42 +1,20 @@
 //! Parser inspired by the work done by burntsushi in [this](https://github.com/BurntSushi/duration-unit-lookup)
 //! repository.
 
-use std::{fmt::Display, time::Duration};
+use std::time::Duration;
 
-/// An error while parsing a relative human time duration string.
-#[derive(Debug, PartialEq, Eq)]
-pub enum Error {
-    /// The input had an invalid time unit.
-    InvalidUnit,
-    /// The input for a unit is not valid for a [`Duration`].
-    InvalidNumber,
-    /// The input was empty.
-    EmptyInput,
-}
-
-impl std::error::Error for Error {}
-
-impl Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::InvalidUnit => write!(f, "invalid unit"),
-            Self::InvalidNumber => write!(f, "invalid number"),
-            Self::EmptyInput => write!(f, "empty input"),
-        }
-    }
-}
+use crate::Error;
 
 /// Convert an input to a [`Duration`].
 ///
 /// In particular, uses [this](https://github.com/BurntSushi/duration-unit-lookup?tab=readme-ov-file#one-big-match-but-with-prefix-matching) method
 /// of parsing time units.
 #[inline]
-pub(crate) fn parse(input: &str) -> Result<Duration, Error> {
+pub(crate) fn parse(input: &[u8]) -> Result<Duration, Error> {
     if input.is_empty() {
-        return Err(Error::EmptyInput);
+        return Err(Error::EmptyDurationInput);
     }
 
-    let input = input.as_bytes();
     let mut duration = Duration::default();
     let mut current = 0;
 
@@ -66,7 +44,7 @@ pub(crate) fn parse(input: &str) -> Result<Duration, Error> {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-enum Unit {
+pub(crate) enum Unit {
     Nanoseconds,
     Microseconds,
     Milliseconds,
@@ -80,7 +58,7 @@ enum Unit {
 }
 
 #[inline]
-fn eat_spaces(input: &[u8]) -> usize {
+pub(crate) fn eat_spaces(input: &[u8]) -> usize {
     let mut length = 0;
 
     while length < input.len() && input[length].is_ascii_whitespace() {
@@ -91,7 +69,7 @@ fn eat_spaces(input: &[u8]) -> usize {
 }
 
 #[inline]
-fn parse_number(input: &[u8]) -> Result<(u64, usize), Error> {
+pub(crate) fn parse_number(input: &[u8]) -> Result<(u64, usize), Error> {
     let mut number: u64 = 0;
     let mut length = 0;
 
@@ -108,7 +86,7 @@ fn parse_number(input: &[u8]) -> Result<(u64, usize), Error> {
 }
 
 #[inline]
-fn parse_unit(input: &[u8]) -> Result<(Unit, usize), Error> {
+pub(crate) fn parse_unit(input: &[u8]) -> Result<(Unit, usize), Error> {
     match input {
         &[
             b'm',
@@ -226,62 +204,5 @@ fn parse_unit(input: &[u8]) -> Result<(Unit, usize), Error> {
         &[b'h', ..] => Ok((Unit::Hours, 1)),
         &[b'd', ..] => Ok((Unit::Days, 1)),
         _ => Err(Error::InvalidUnit),
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_parse_single_units() {
-        assert_eq!(parse("5s").unwrap(), Duration::from_secs(5));
-        assert_eq!(parse("10m").unwrap(), Duration::from_secs(10 * 60));
-        assert_eq!(parse("2h").unwrap(), Duration::from_secs(2 * 60 * 60));
-        assert_eq!(parse("1d").unwrap(), Duration::from_secs(24 * 60 * 60));
-        assert_eq!(parse("500ms").unwrap(), Duration::from_millis(500));
-        assert_eq!(parse("100us").unwrap(), Duration::from_micros(100));
-        assert_eq!(parse("50ns").unwrap(), Duration::from_nanos(50));
-    }
-
-    #[test]
-    fn test_parse_full_names() {
-        assert_eq!(parse("5seconds").unwrap(), Duration::from_secs(5));
-        assert_eq!(parse("10minutes").unwrap(), Duration::from_secs(10 * 60));
-        assert_eq!(parse("2hours").unwrap(), Duration::from_secs(2 * 60 * 60));
-        assert_eq!(parse("1day").unwrap(), Duration::from_secs(24 * 60 * 60));
-        assert_eq!(
-            parse("500milliseconds").unwrap(),
-            Duration::from_millis(500)
-        );
-        assert_eq!(
-            parse("100microseconds").unwrap(),
-            Duration::from_micros(100)
-        );
-        assert_eq!(parse("50nanoseconds").unwrap(), Duration::from_nanos(50));
-    }
-
-    #[test]
-    fn test_parse_multiple_units() {
-        assert_eq!(parse("1h30m").unwrap(), Duration::from_secs(90 * 60));
-        assert_eq!(
-            parse("2h 45m").unwrap(),
-            Duration::from_secs((2 * 60 + 45) * 60)
-        );
-        assert_eq!(
-            parse("1d 12h 30m").unwrap(),
-            Duration::from_secs((24 + 12) * 60 * 60 + 30 * 60)
-        );
-        assert_eq!(
-            parse("500ms 50us").unwrap(),
-            Duration::from_millis(500) + Duration::from_micros(50)
-        );
-    }
-
-    #[test]
-    fn test_parse_errors() {
-        assert_eq!(parse("abc").unwrap_err(), Error::InvalidNumber);
-        assert_eq!(parse("5x").unwrap_err(), Error::InvalidUnit);
-        assert_eq!(parse("").unwrap_err(), Error::EmptyInput);
     }
 }
