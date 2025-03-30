@@ -35,4 +35,4 @@ fn main() {
 
 ## Licensing
 
-relhu is dual-licensed under MIT and Apache-2.0 at your choice.
+relhu is dual-licensed under MIT or Apache-2.0 at your choice.
