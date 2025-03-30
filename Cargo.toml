@@ -6,6 +6,7 @@ readme = "README.md"
 license = "MIT, Apache-2.0"
 repository = "https://github.com/ClementTsang/relhu"
 documentation = "https://docs.rs/relhu"
+description = "A library that can parse relative and/or human time duration strings."
 authors = ["Clement Tsang <cjhtsang@uwaterloo.ca>"]
 keywords = ["duration", "time", "instant", "parse", "human", "relative"]
 categories = ["date-and-time"]
