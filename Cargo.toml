@@ -8,7 +8,7 @@ repository = "https://github.com/ClementTsang/relhu"
 documentation = "https://docs.rs/relhu"
 description = "A library that can parse relative and/or human time duration strings."
 authors = ["Clement Tsang <cjhtsang@uwaterloo.ca>"]
-keywords = ["duration", "time", "instant", "parse", "human", "relative"]
+keywords = ["duration", "time", "parse", "human", "relative"]
 categories = ["date-and-time"]
 exclude = ["scripts", "target", ".markdownlint.json", "CHANGELOG.md"]
 
