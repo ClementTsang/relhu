@@ -9,7 +9,7 @@ documentation = "https://docs.rs/relhu"
 authors = ["Clement Tsang <cjhtsang@uwaterloo.ca>"]
 keywords = ["duration", "time", "instant", "parse", "human", "relative"]
 categories = ["date-and-time"]
-exclude = ["scripts", "target", ".markdownlint.json"]
+exclude = ["scripts", "target", ".markdownlint.json", "CHANGELOG.md"]
 
 [lib]
 test = true
