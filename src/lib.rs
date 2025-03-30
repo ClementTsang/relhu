@@ -83,7 +83,7 @@ pub fn parse_instant(input: &str) -> Result<Instant, Error> {
 }
 
 /// Parse `input` as an [`Instant`], based on a provided [`Instant`]. If the input will result in overflow,
-///     it will return `None`.
+/// it will return `None`.
 ///
 /// # Examples
 ///
@@ -102,7 +102,7 @@ pub fn checked_parse_with_instant(input: &str, now: Instant) -> Result<Option<In
     }
 }
 
-/// Parse `input` as an [`Instant`].
+/// Parse `input` as an [`Instant`]. If the input will result in overflow, it will return `None`.
 ///
 /// # Examples
 ///
